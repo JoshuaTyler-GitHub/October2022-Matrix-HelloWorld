@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Head -->
+  <head>
+    <link id="favicon" rel="icon" href="public/favicon.ico" />
+    <link rel="stylesheet" href="bootstrap.css" />
+    <meta charset="utf-8" />
+    <style media="screen">
+      #canvas {
+        background: #0d0208;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        width: 100vw;
+        z-index: -1;
+      }
+    </style>
+    <title>October2022-MatrixHelloWorld</title>
+  </head>
+
+  <!-- No-Script -->
+  <noscript>You need to enable JavaScript to run this website.</noscript>
+
+  <!-- Body -->
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Column 1 -->
+        <div class="col-12 d-flex justify-content-center py-5 text-light">
+          <h1>Hello World</h1>
+        </div>
+      </div>
+    </div>
+    <canvas id="canvas"></canvas>
+  </body>
+
+  <!-- Scripts -->
+  <script type="text/javascript">
+    // constants
+    const fontSize = Number('20');
+    const matrixCharacter = String('1234567890-=QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm,./;');
+
+    // canvas
+    const canvas = document.getElementById('canvas');
+    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+    canvas.width = canvas.clientWidth * window.devicePixelRatio;
+    const context = canvas.getContext('2d');
+
+    // set font
+    context.font = String(`${fontSize}px arial`);
+
+    // matrix variables
+    const columnCount = Math.floor(canvas.width / fontSize);
+    const columns = Array(columnCount).fill().map(() => {
+      return {
+        lastCharacter: String(''),
+        yOffset: Number('0'),
+      }
+    });
+
+    // draw loop
+    const drawMatrixWaterfall = () => {
+      // fade out canvas
+      context.fillStyle = String('rgb(0, 0, 0, 0.1)');
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      // draw characters
+      for(let i = 0; i < columnCount; i++) {
+        const column = columns[i];
+        const { lastCharacter, yOffset } = column
+        const yOffsetMinus1 = yOffset - fontSize;
+        const yOffsetMinus20 = yOffset - (fontSize * 50);
+
+        // get random character
+        const randomCharacterPosition = Math.floor(Math.random() * matrixCharacter.length);
+        const randomCharacter = String(matrixCharacter[randomCharacterPosition]);
+        
+        // set x offset
+        const xOffset = Number(i * fontSize);
+
+        // draw green trailing character
+        context.fillStyle = String('rgb(0, 0, 0)');
+        context.fillRect(xOffset, yOffsetMinus1, fontSize, fontSize);
+        context.fillStyle = String('#00FF41');
+        context.fillText(lastCharacter, xOffset, yOffsetMinus1);
+
+        // draw first white character
+        context.fillStyle = String('#FFFFFF');
+        context.fillText(randomCharacter, xOffset, yOffset);
+
+        // trail dissapation
+        context.fillStyle = String('rgb(0, 0, 0)');
+        context.fillRect(xOffset, yOffsetMinus20, fontSize, fontSize);
+
+        // update lastCharacter
+        column.lastCharacter = randomCharacter;
+
+        // check to see if yOffset is off the canvas
+        if(yOffset > canvas.height && Math.random() < 0.05) {
+          column.yOffset = Number('0');
+        }
+        
+        // progress yOffset down page
+        else {
+          column.yOffset += fontSize;
+        }
+
+      }
+
+    };
+    setInterval(drawMatrixWaterfall, 50);
+  </script>
+</html>
